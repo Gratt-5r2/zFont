@@ -18,4 +18,9 @@ namespace GOTHIC_ENGINE {
 	public:
 		virtual void ApplyFilter();
 	};
+
+	class Filter_Highlight : public Filter {
+	public:
+		virtual void ApplyFilter();
+	};
 }
