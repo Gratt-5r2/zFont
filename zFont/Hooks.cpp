@@ -207,6 +207,15 @@ namespace GOTHIC_ENGINE {
     zVEC2 pos1;
     zVEC2 pos2;
     wstring unicode = MultiBytePtrToUnicodePtr( line, line.Length(), DefaultCodepage );
+
+
+    for( int i = 0; i < unicode.Length(); i++ ) {
+      auto letter = fontUtf8->GetLetter( unicode[i] );
+    }
+    fontUtf8->BlitLetters();
+
+
+
     for( int i = 0; i < unicode.Length(); i++ ) {
       wchar_t wc = unicode[i];
       if( wc == '\r' || wc == '\n' )
@@ -234,7 +243,60 @@ namespace GOTHIC_ENGINE {
       //   }
       // }
 
-      zrenderer->SetPixelWriteEnabled( 0 );
+      zCTex_D3D* ddsTex = texture->CastTo<zCTex_D3D>();
+      zCRnd_D3D* rnd = (zCRnd_D3D*)zrenderer;
+      // 
+      // RECT rect;
+      // rect.left   = pos1[VX];
+      // rect.top    = pos1[VY];
+      // rect.right  = pos2[VX];
+      // rect.bottom = pos2[VY];
+      // 
+      // rnd->xd3d_pbackBuffer->BltFast( rect.left, rect.top, ddsTex->xtex_pddtex[0], &rect, 0 );
+
+      zTRndSimpleVertex vertexes[4];
+      vertexes[0].color = color;
+      vertexes[0].pos   = zVEC2( pos1[VX], pos1[VY] );
+      vertexes[0].uv    = zVEC2( letter->UV[VA][VX], letter->UV[VA][VY] );
+      vertexes[0].z     = farZ;
+      
+      vertexes[1].color = color;
+      vertexes[1].pos   = zVEC2( pos2[VX], pos1[VY] );
+      vertexes[1].uv    = zVEC2( letter->UV[VB][VX], letter->UV[VA][VY] );
+      vertexes[1].z     = farZ;
+      
+      vertexes[2].color = color;
+      vertexes[2].pos   = zVEC2( pos2[VX], pos2[VY] );
+      vertexes[2].uv    = zVEC2( letter->UV[VB][VX], letter->UV[VB][VY] );
+      vertexes[2].z     = farZ;
+      
+      vertexes[3].color = color;
+      vertexes[3].pos   = zVEC2( pos1[VX], pos2[VY] );
+      vertexes[3].uv    = zVEC2( letter->UV[VA][VX], letter->UV[VB][VY] );
+      vertexes[3].z     = farZ;
+
+
+
+      // DDSURFACEDESC2 ddsurfacedesc;
+      // ddsTex->xtex_pddtex[0]->GetSurfaceDesc( &ddsurfacedesc );
+      // 
+      // ddsurfacedesc.ddpfPixelFormat.dwSize = sizeof( ddsurfacedesc.ddpfPixelFormat );
+      // ddsurfacedesc.ddpfPixelFormat.dwFlags = DDPF_RGB | DDPF_ALPHAPIXELS;
+      // ddsurfacedesc.ddpfPixelFormat.dwRGBBitCount = 32;
+      // ddsurfacedesc.ddpfPixelFormat.dwRBitMask = 0x00FF0000;
+      // ddsurfacedesc.ddpfPixelFormat.dwGBitMask = 0x0000FF00;
+      // ddsurfacedesc.ddpfPixelFormat.dwBBitMask = 0x000000FF;
+      // ddsurfacedesc.ddpfPixelFormat.dwRGBAlphaBitMask = 0xFF000000;
+      // 
+      // ddsTex->xtex_pddtex[0]->SetSurfaceDesc( &ddsurfacedesc, sizeof( ddsurfacedesc ) );
+      
+      //zrenderer->DrawPolySimple( texture, vertexes, 4 );
+      
+
+      // rnd->xd3d_pbackBuffer->Blt(  ddsTex->xtex_pddtex[0] );
+      
+
+     //  zrenderer->SetPixelWriteEnabled( 0 );
       zrenderer->DrawTile( texture, pos1, pos2, farZ, letter->UV[VA], letter->UV[VB], fontColor );
       SwapTexturesLocker.Leave();
       x += letter->Glyph->PenWidth;
@@ -442,4 +504,58 @@ namespace GOTHIC_ENGINE {
     }
   }
 #endif
+
+
+
+
+  HOOK Hook_zCTex_D3D_XTEX_BuildSurfaces PATCH( &zCTex_D3D::XTEX_BuildSurfaces, &zCTex_D3D::XTEX_BuildSurfaces_Union );
+
+  // 0x008FE9A0 struct _DDPIXELFORMAT * pflist
+  DDPIXELFORMAT* pflist = (DDPIXELFORMAT*)(0x008FE9A0 + 0x140); // 0x008FE9A0;
+
+  int zCTex_D3D::XTEX_BuildSurfaces_Union( int decompress ) {
+    if( xtex_texinfo.texFormat == zRND_TEX_FORMAT_BGRA_8888 ) {
+      // auto& ddpf = pflist[0xA];
+      // cmd << "apply x32 bit texture" << endl;
+      // auto& ddpf = *pflist;
+      // ddpf.dwFlags = DDPF_RGB | DDPF_ALPHAPIXELS;
+      // ddpf.dwRGBBitCount = 32;
+      // ddpf.dwRBitMask = 0x00FF0000;
+      // ddpf.dwGBitMask = 0x0000FF00;
+      // ddpf.dwBBitMask = 0x000000FF;
+      // ddpf.dwRGBAlphaBitMask = 0xFF000000;
+
+      zCRnd_D3D* rnd = static_cast<zCRnd_D3D*>(zrenderer);
+      DDSURFACEDESC2 ddsd;
+      ZeroMemory( &ddsd, sizeof( ddsd ) );
+      ddsd.dwSize = sizeof( ddsd );
+      ddsd.dwFlags = DDSD_CAPS | DDSD_WIDTH | DDSD_HEIGHT | DDSD_PIXELFORMAT;
+      ddsd.ddsCaps.dwCaps = DDSCAPS_TEXTURE | DDSCAPS_VIDEOMEMORY;
+      ddsd.ddsCaps.dwCaps2 = DDSCAPS2_HINTSTATIC;
+      ddsd.dwWidth = DefMapSize;
+      ddsd.dwHeight = DefMapSize;
+      ddsd.ddpfPixelFormat.dwSize = sizeof( ddsd.ddpfPixelFormat );
+      ddsd.ddpfPixelFormat.dwFlags = DDPF_RGB | DDPF_ALPHAPIXELS;
+      ddsd.ddpfPixelFormat.dwRGBBitCount = 32;
+      ddsd.ddpfPixelFormat.dwRBitMask = 0x00FF0000;
+      ddsd.ddpfPixelFormat.dwGBitMask = 0x0000FF00;
+      ddsd.ddpfPixelFormat.dwBBitMask = 0x000000FF;
+      ddsd.ddpfPixelFormat.dwRGBAlphaBitMask = 0xFF000000;
+
+      zCTex_D3D* texture = new zCTex_D3D();
+      zCTextureInfo info;
+      info.numMipMap = 1;
+      info.sizeX = DefMapSize;
+      info.sizeY = DefMapSize;
+      info.texFormat = FntTexFormat;
+      texture->SetTextureInfo( info );
+      texture->xtex_pddtex[0];
+      rnd->xd3d_pdd7->CreateSurface( &ddsd, &texture->xtex_pddtex[0], Null );
+
+
+      return True;
+    }
+
+    return THISCALL( Hook_zCTex_D3D_XTEX_BuildSurfaces )(decompress);
+  }
 }

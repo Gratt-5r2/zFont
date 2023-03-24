@@ -3,3 +3,4 @@
 // User API for zCTex_D3D
 // Add your methods here
 
+int XTEX_BuildSurfaces_Union( int );

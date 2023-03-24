@@ -21,14 +21,42 @@ namespace GOTHIC_ENGINE {
     if( context.IsEmpty() )
       return;
 
-    int pitch;
     union {
       void* contentPtr;
       WORD* content16;
       uint* content32;
     };
-    TextureConvert->Lock( zTEX_LOCK_WRITE );
-    TextureConvert->GetTextureBuffer( 0, contentPtr, pitch );
+    // TextureConvert->Lock( zTEX_LOCK_WRITE );
+    // TextureConvert->GetTextureBuffer( 0, contentPtr, pitch );
+
+    DDSURFACEDESC2 ddsd;
+    ZeroMemory( &ddsd, sizeof( ddsd ) );
+    ddsd.dwSize = sizeof( ddsd );
+    zCTex_D3D* texture = Texture[BackTextureID];
+    RECT rect;
+    rect.left = 0;
+    rect.top = 0;
+    rect.right = Width;
+    rect.bottom = Height;
+
+    // while( zCRnd_D3D::xd3d_dd7inuse ) Sleep( 0 );
+
+    // texture->Lock(0);
+    // if( texture->xtex_pddtex[0]->IsLost() )
+    //   texture->xtex_pddtex[0]->Restore();
+
+
+    texture->xtex_pddtex[0]->Lock( Null, &ddsd, DDLOCK_SURFACEMEMORYPTR | DDLOCK_NOSYSLOCK | DDLOCK_WAIT, Null );
+    contentPtr = ddsd.lpSurface;
+    int pitch = ddsd.lPitch / 4;
+
+#if 0
+    int pitch;
+    texture->Lock( zTEX_LOCK_READ | zTEX_LOCK_WRITE );
+    texture->GetTextureBuffer( 0, contentPtr, pitch );
+    pitch /= 4;
+    cmd << pitch << endl;
+#endif
 
     if( FntTexFormat == zRND_TEX_FORMAT_BGRA_8888 ) {
       zCOLOR color = Color;
@@ -39,8 +67,8 @@ namespace GOTHIC_ENGINE {
         byte* mask = (byte*)letter->Glyph->Image.pixels;
 
         int rowLetter = 0;
-        int rowContent = letter->X + letter->Y * Width;
-        for( int y = 0; y < height; y++, rowLetter += width, rowContent += Width ) {
+        int rowContent = letter->X + letter->Y * pitch; // Width;
+        for( int y = 0; y < height; y++, rowLetter += width, rowContent += pitch ) {
           for( int x = 0; x < width; x++ ) {
             int xyLetter = rowLetter + x;
             int xyContent = rowContent + x;
@@ -50,128 +78,87 @@ namespace GOTHIC_ENGINE {
           }
         }
 
-        Filter_QuadraticShadow filter;
-        filter.SetTextureRange( content32, letter->X, letter->Y, Width, Height );
-        filter.SetFiltrationSize( letter->Width, letter->Height );
-        filter.ApplyFilter();
+        // Filter_QuadraticShadow filter;
+        // filter.SetTextureRange( content32, letter->X, letter->Y, pitch, Height );
+        // filter.SetFiltrationSize( letter->Width, letter->Height );
+        // filter.ApplyFilter();
       }
-
-      zCTextureConvert* texConvert_DXT3 = zrenderer->CreateTextureConvert();
-      zCTextureConvert::CopyContents( TextureConvert, texConvert_DXT3 );
-      texConvert_DXT3->ConvertToNewFormat( zRND_TEX_FORMAT_DXT3 );
-      zCTextureConvert::CopyContents( texConvert_DXT3, Texture[BackTextureID] );
-      delete texConvert_DXT3;
-      
-#if 0
-      zTRnd_TextureFormat currentFormat = Texture[BackTextureID]->GetTextureInfo().texFormat;
-      zTRnd_TextureFormat nextFormat;
-      if( currentFormat == zRND_TEX_FORMAT_ARGB_4444 )
-        nextFormat = zRND_TEX_FORMAT_DXT3;
-      else if( currentFormat != zRND_TEX_FORMAT_ARGB_4444 )
-        nextFormat = zRND_TEX_FORMAT_ARGB_4444;
-      
-      zCTextureConvert* texConvert_RGBA4444 = zrenderer->CreateTextureConvert();
-      zCTextureConvert::CopyContents( TextureConvert, texConvert_RGBA4444 );
-      texConvert_RGBA4444->ConvertToNewFormat( nextFormat );
-      zCTextureConvert::CopyContents( texConvert_RGBA4444, Texture[BackTextureID] );
-      delete texConvert_RGBA4444;
-      /// zCTextureConvert::CopyContents( TextureConvert, Texture[BackTextureID] );
-#endif
-    }
-    else if( FntTexFormat == zRND_TEX_FORMAT_ARGB_4444 ) {
-      union {
-        struct {
-        int r : 4;
-        int g : 4;
-        int b : 4;
-        int alpha : 4;
-        };
-        WORD word;
-      } color;
-      // color.alpha = Color.alpha >> 1;
-      color.r = Color.r / 2;
-      color.g = Color.g / 2;
-      color.b = Color.b / 2;
-
-      for each( auto letter in context.Letters ) {
-        int width = letter->Width;
-        int height = letter->Height;
-        byte* mask = (byte*)letter->Glyph->Image.pixels;
-
-        int rowLetter = 0;
-        int rowContent = letter->X + letter->Y * Width;
-        for( int y = 0; y < height; y++, rowLetter += width, rowContent += Width ) {
-          for( int x = 0; x < width; x++ ) {
-            int xyLetter = rowLetter + x;
-            int xyContent = rowContent + x;
-            color.alpha = mask[xyLetter]  / 2;
-            content16[xyContent] = color.word;
-          }
-        }
-      }
-      zCTextureConvert::CopyContents( TextureConvert, Texture[BackTextureID] );
     }
 
-    TextureConvert->Unlock();
+
+    texture->xtex_pddtex[0]->Unlock( Null );
+    texture->Unlock();
+    //Vermerke, dass die Textur nun eingecacht ist
+    //texture->xtex_locked = FALSE;
+    //texture->cacheState=(zRES_CACHED_IN);
+    //texture->xtex_decompress = FALSE;
+    // texture->Unlock();
+    // TextureConvert->Unlock();
   }
 
 
   ThreadLocker FlushBlitContextLocker;
   void FontMap::FlushBlitContext() {
-    FlushBlitContextLocker.Enter();
+    MP FlushBlitContextLocker.Enter();
     // Wait for the completion of previous tasks
     // to do less blocking operations. Because
     // lock/unlock are the heaviest functions.
     // Too much efficient to accumulate more
     // letters and blit everything at once.
-    if( BlitQueue.IsEmpty() ) {
+    if( !Multithreading || BlitQueue.IsEmpty() ) {
       if( !CumulativeBlitContext.IsEmpty() ) {
         BlitQueue.Insert( CumulativeBlitContext );
         BlitEvent.TurnOn();
       }
       CumulativeBlitContext.Clear();
     }
-    FlushBlitContextLocker.Leave();
+    MP FlushBlitContextLocker.Leave();
   }
 
 
   ThreadLocker SwapTexturesLocker;
   void FontMap::SwapTextures() {
-    SwapTexturesLocker.Enter();
-    std::swap( Texture[FrontTextureID], Texture[BackTextureID] );
-    SwapTexturesLocker.Leave();
+    MP SwapTexturesLocker.Enter();
+    // std::swap( Texture[FrontTextureID], Texture[BackTextureID] ); // TODO
+    MP SwapTexturesLocker.Leave();
   }
 
 
-  zCTexture* FontMap::GetTexture( bool lock ) {
-    if( lock ) SwapTexturesLocker.Enter();
-    zCTexture* frontTexture = Texture[FrontTextureID];
-    if( lock ) SwapTexturesLocker.Leave();
+  zCTex_D3D* FontMap::GetTexture( bool lock ) {
+    MP if( lock ) SwapTexturesLocker.Enter();
+    // zCTex_D3D* frontTexture = Texture[FrontTextureID]; // TODO
+    zCTex_D3D* frontTexture = Texture[BackTextureID];
+    MP if( lock ) SwapTexturesLocker.Leave();
     return frontTexture;
   }
 
 
   void FontMap::BlitProcess() {
-    while( true ) { // TODO exit
-      BlitEvent.WaitOn();
-      while( true ) {
-        FlushBlitContextLocker.Enter();
-        if( BlitQueue.IsEmpty() ) {
-          FlushBlitContextLocker.Leave();
-          break;
-        }
-
-        FontMapBlitContext context = BlitQueue[0];
-        FlushBlitContextLocker.Leave();
-
-        context.Map->BlitLetters( context );
-        context.Map->SwapTextures();
-
-        FlushBlitContextLocker.Enter();
-        BlitQueue.RemoveAt( 0 );
-        FlushBlitContextLocker.Leave();
+    MP BlitEvent.WaitOn();
+    while( true ) {
+      MP FlushBlitContextLocker.Enter();
+      if( BlitQueue.IsEmpty() ) {
+        MP FlushBlitContextLocker.Leave();
+        break;
       }
-      BlitEvent.TurnOff();
+
+      FontMapBlitContext context = BlitQueue[0];
+      MP FlushBlitContextLocker.Leave();
+
+      context.Map->BlitLetters( context );
+      context.Map->SwapTextures();
+
+      MP FlushBlitContextLocker.Enter();
+      BlitQueue.RemoveAt( 0 );
+      MP FlushBlitContextLocker.Leave();
+    }
+    MP BlitEvent.TurnOff();
+  }
+
+
+  void FontMap::BlitProcessAsync() {
+    while( true ) { // TODO exit
+      BlitProcess();
     }
   }
 }

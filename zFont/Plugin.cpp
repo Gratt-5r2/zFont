@@ -125,107 +125,14 @@ namespace GOTHIC_ENGINE {
 
   void Game_Entry() {
     Union.GetSysPackOption().Read( FontScale, "Font", "Scale", FontScale );
-  }
-
-#if 0
-  zCView* GetFontView( string fontName, int xpos ) {
-    zCTexture* tex = Null;
-    for each( auto font in Fonts )
-    {
-      if( font.GetValue()->Name.HasWordI( fontName ) ) {
-        cmd << font.GetValue()->Name << endl;
-        tex = font.GetValue()->Maps[0]->Texture;
-        break;
-      }
-    }
-    if( !tex )
-      return Null;
-
-    // auto font = Font::GetFont( fontName, 42.5001, FontMetrix::Px );
-    time_t time0 = Timer::GetTime();
-    //for( int i = ' '; i < 'z'; i++ ) font->GetLetter( i );
-    // for( int i = L'а'; i < L'я'; i++ ) font->GetLetter( i );
-    // for( int i = L'А'; i < L'Я'; i++ ) font->GetLetter( i );
-    // for( int i = 0; i < 1000; i++ ) font->GetLetter( i + L'思' );
-
-    //font->BlitLetters();
-    time_t time1 = Timer::GetTime();
-    cmd << "time:" << time1 - time0 << endl;
-
-    zCView* view = new zCView();
-    screen->InsertItem( view );
-    view->SetSize( screen->anx( DefMapSize ), screen->any( DefMapSize ) );
-    view->SetPos( xpos, 500 );
-    view->InsertBack( tex );
-    cmd << AHEX32( view ) << endl;
-    return view;
-  }
-#endif
-  
-  // 0x008FE9A0 struct _DDPIXELFORMAT* pflist
-  _DDPIXELFORMAT* pflist = (_DDPIXELFORMAT*)0x008FE9A0;
-  void Game_Init() {
-    for( int i = 0; i < 32; i++ )
-    {
-      auto fmt = pflist[i];
-      cmd << i << "  " << fmt.dwRGBBitCount << endl;
-
-    }
-
-
-
-
-
-
-    //system( "pause" );
-#if 0
-    // GetFontView( "Ubuntu-Regular.ttf", 500 );
-    // GetFontView( "FONT_OLD_20_WHITE ", 500 );
-    // GetFontView( "SourceHanSansSC-VF.ttf", 5500 );
-    Array<wchar_t> letters;
-
-    string AllAnsi;
-    string AllUtf8;
-
-    auto& array = parser->symtab.table;
-    for( int i = 0; i < array.GetNum(); i++ ) {
-      auto sym = array[i];
-      if( sym->type == zPAR_TYPE_STRING && sym->HasFlag( zPAR_FLAG_CONST ) ) {
-        int capacity = sym->ele;
-        // cmd << sym->name << "  " << capacity << endl;
-        zSTRING value;
-        for( int j = 0; j < capacity; j++ ) {
-          sym->GetValue( value, j );
-          if( !Dic_StringIsUtf8( value, value.Length() ) ) {
-            // cmd << sym->name << "  " << capacity << endl;
-            // cmd << "  >" << value << "  " << value.Length() << endl;
-            AllAnsi += A (parser->GetFileName(sym->filenr) + " " + zSTRING((int)sym->filenr) + "  " + (value + "\r\n"));
-          }
-          else
-            AllUtf8 += A( parser->GetFileName( sym->filenr ) + " " + zSTRING( (int)sym->filenr ) + "  " + value + "\r\n" );
-
-          //   cmd << "  >" << value << "  " << value.Length() << endl;
-          // if( sym->name == "я14475" ) {
-          //   system( "pause" );
-          //   continue;
-          // }
-          // wstring utf16 = UTF8toUnicode( value );
-          // cmd << "  <" << utf16 << endl;
-          // for( int k = 0; k < utf16.Length(); k++ )
-          //   letters |= utf16[k];
-        }
-      }
-    }
-
-    AllAnsi.WriteToFile( "AllAnsi.txt" );
-    AllUtf8.WriteToFile( "AllUtf8.txt" );
-    Message::Box( letters.GetNum() );
-#endif
-
-    Thread( FontMap::BlitProcess ).Detach();
+    if( Multithreading )
+      Thread( FontMap::BlitProcessAsync ).Detach();
   }
 
   void Game_Exit() {
+  }
+
+  void Game_Init() {
   }
 
   void Game_PreLoop() {
@@ -234,6 +141,9 @@ namespace GOTHIC_ENGINE {
   void Game_Loop() {
     // static auto view = GetFontView( "FONT_OLD_20_WHITE", 500 );
      Font::BlitLetters();
+
+    if( !Multithreading )
+      FontMap::BlitProcess();
  //   FontMap::BlitProcess();
     // screen->Print( 6000, 4000, "Hello world with printing texts" );
   }
@@ -243,6 +153,9 @@ namespace GOTHIC_ENGINE {
 
   void Game_MenuLoop() {
      Font::BlitLetters();
+
+     if( !Multithreading )
+       FontMap::BlitProcess();
   //  FontMap::BlitProcess();
   }
 

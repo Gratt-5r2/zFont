@@ -9,7 +9,7 @@ namespace GOTHIC_ENGINE {
 #define Px2Pt(value) (value * 0.75292857248934)
 #define FntTexFormat zTRnd_TextureFormat::zRND_TEX_FORMAT_BGRA_8888
 // #define FntTexFormat zTRnd_TextureFormat::zRND_TEX_FORMAT_ARGB_4444
-#define DefMapSize 512
+#define DefMapSize 1024
 #define FrontTextureID 0
 #define BackTextureID 1
 #define MapTexturesCount 2
@@ -17,6 +17,8 @@ namespace GOTHIC_ENGINE {
 	int DefaultCodepage = CP_UTF8;
 	float FontScale = 1.0;
 	bool TTFOnly = true; // TODO
+	bool Multithreading = false;
+#define MP if( Multithreading )
 
 	struct Glyph;
 	struct Letter;
@@ -24,7 +26,7 @@ namespace GOTHIC_ENGINE {
 	struct Font;
 
 
-	enum class FontMetrix {
+	enum class FontUnits {
 		Px,
 		Pt,
 		Gp // 'Gothic parrots': aligns ascender and descender of the
@@ -43,7 +45,7 @@ namespace GOTHIC_ENGINE {
 		byte* Memory;
 		SFT* Schrift;
 		Glyph* GetGlyph( wchar_t id );
-		static FontGeneric* GetFont(const string& name, double size, FontMetrix metrix = FontMetrix::Pt);
+		static FontGeneric* GetFont(const string& name, double size, FontUnits metrix = FontUnits::Pt);
 		~FontGeneric();
 	};
 
@@ -62,7 +64,7 @@ namespace GOTHIC_ENGINE {
 		FontMapBlitContext CumulativeBlitContext;
 
 		Font* OwnedFont;
-		zCTexture* Texture[2];
+		zCTex_D3D* Texture[2];
 		zCTextureConvert* TextureConvert;
 		zCOLOR Color;
 		int Width;
@@ -74,6 +76,7 @@ namespace GOTHIC_ENGINE {
 		bool HasFreeSpace( int width, int height );
 		Letter* CreateLetter( Glyph* glyph );
 		void Free();
+		static zCTex_D3D* CreateTexture();
 		static FontMap* Create( Font* font, const zCOLOR& color, int width = DefMapSize, int height = DefMapSize );
 
 		static Array<FontMapBlitContext> BlitQueue;
@@ -81,8 +84,9 @@ namespace GOTHIC_ENGINE {
 		void BlitLetters( FontMapBlitContext& context );
 		void FlushBlitContext();
 		void SwapTextures();
-	  zCTexture* GetTexture( bool lock );
+		zCTex_D3D* GetTexture( bool lock );
 		static void BlitProcess();
+		static void BlitProcessAsync();
 	};
 
 
@@ -96,9 +100,9 @@ namespace GOTHIC_ENGINE {
 		FontMap* GetMap( int requiredWidth, int requiredHeight );
 		void Free();
 		void PreRender();
-		static Font* GetFont( const string& name, const zCOLOR& color, double defaultSize = 18.0, FontMetrix metrix = FontMetrix::Pt );
+		static Font* GetFont( const string& name, const zCOLOR& color, double defaultSize = 18.0, FontUnits metrix = FontUnits::Pt );
 		static Font* GetFont( zCFont* ingameFont );
-		static Font* GetFontDefault( double defaultSize = 18.0, FontMetrix metrix = FontMetrix::Pt );
+		static Font* GetFontDefault( double defaultSize = 18.0, FontUnits metrix = FontUnits::Pt );
 		static void BlitLetters();
 		~Font();
 	};

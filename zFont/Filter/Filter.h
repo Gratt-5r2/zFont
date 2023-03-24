@@ -8,14 +8,23 @@ namespace GOTHIC_ENGINE {
 		int Width;
 		int Height;
 	public:
-		void SetTextureRange( void* pixels, int x, int y, int w, int h );
-		void SetFiltrationSize( int w, int h );
-		virtual void ApplyFilter()=0;
+		Filter() { }
+		Filter( Filter& filter );
+		void __fastcall SetTextureRange( void* pixels, int x, int y, int w, int h );
+		void __fastcall SetFiltrationSize( int w, int h );
 	};
 
 
 	class Filter_QuadraticShadow : public Filter {
+		void ApplyShadowHorizontal( int x0, int x1, int y );
 	public:
-		virtual void ApplyFilter();
+		void ApplyFilter();
+	};
+
+
+	class Filter_Glitter : public Filter {
+		void ApplyGlitter( int x0, int x1, int y );
+	public:
+		void ApplyFilter();
 	};
 }
