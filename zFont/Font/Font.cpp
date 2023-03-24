@@ -345,18 +345,18 @@ namespace GOTHIC_ENGINE {
 #define COMPILE_LETTERS(from, to) for( int i = from; i <= to; i++ ) { GetLetter( i ); /*cmd << wstring( (wchar_t)i ) << " ";*/ } /*cmd << endl;*/
 
   void Font::PreRender() {
-    cmd << "creating default chars begin... ";
-    COMPILE_LETTERS( 0x0020, 0x007F ); // Basic Latin
-    COMPILE_LETTERS( 0x00A0, 0x00FF ); // Latin-1 Supplement
-    COMPILE_LETTERS( 0x0100, 0x017F ); // Latin Extended-A	
-    COMPILE_LETTERS( 0x0180, 0x024F ); // Latin Extended-B	
-    COMPILE_LETTERS( 0x0250, 0x02AF ); // IPA Extensions	 	
-    COMPILE_LETTERS( 0x0300, 0x036F ); // Combining Diacritical Marks
-    COMPILE_LETTERS( 0x0370, 0x03FF ); // Greek and Coptic
-    COMPILE_LETTERS( 0x0400, 0x04FF ); // Cyrillic
-    BlitLetters();
-    BlitEvent.WaitOff();
-    cmd << " done." << endl;
+  //  cmd << "creating default chars begin... ";
+  //  COMPILE_LETTERS( 0x0020, 0x007F ); // Basic Latin
+  //  COMPILE_LETTERS( 0x00A0, 0x00FF ); // Latin-1 Supplement
+  //  COMPILE_LETTERS( 0x0100, 0x017F ); // Latin Extended-A	
+  //  COMPILE_LETTERS( 0x0180, 0x024F ); // Latin Extended-B	
+  //  COMPILE_LETTERS( 0x0250, 0x02AF ); // IPA Extensions	 	
+  //  COMPILE_LETTERS( 0x0300, 0x036F ); // Combining Diacritical Marks
+  //  COMPILE_LETTERS( 0x0370, 0x03FF ); // Greek and Coptic
+  //  COMPILE_LETTERS( 0x0400, 0x04FF ); // Cyrillic
+  //  BlitLetters();
+  //  BlitEvent.WaitOff();
+  //  cmd << " done." << endl;
   }
 
 

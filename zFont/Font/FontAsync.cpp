@@ -54,11 +54,16 @@ namespace GOTHIC_ENGINE {
         filter.SetTextureRange( content32, letter->X, letter->Y, Width, Height );
         filter.SetFiltrationSize( letter->Width, letter->Height );
         filter.ApplyFilter();
+
+        Filter_Highlight filter2;
+        filter2.SetTextureRange(content32, letter->X, letter->Y, Width, Height);
+        filter2.SetFiltrationSize(letter->Width, letter->Height);
+        filter2.ApplyFilter();
       }
 
       zCTextureConvert* texConvert_DXT3 = zrenderer->CreateTextureConvert();
       zCTextureConvert::CopyContents( TextureConvert, texConvert_DXT3 );
-      texConvert_DXT3->ConvertToNewFormat( zRND_TEX_FORMAT_DXT3 );
+      texConvert_DXT3->ConvertToNewFormat(zRND_TEX_FORMAT_ARGB_4444);
       zCTextureConvert::CopyContents( texConvert_DXT3, Texture[BackTextureID] );
       delete texConvert_DXT3;
       
