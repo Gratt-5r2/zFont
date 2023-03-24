@@ -78,10 +78,15 @@ namespace GOTHIC_ENGINE {
           }
         }
 
-        // Filter_QuadraticShadow filter;
-        // filter.SetTextureRange( content32, letter->X, letter->Y, pitch, Height );
-        // filter.SetFiltrationSize( letter->Width, letter->Height );
-        // filter.ApplyFilter();
+        Filter_QuadraticShadow filter;
+        filter.SetTextureRange( content32, letter->X, letter->Y, Width, Height );
+        filter.SetFiltrationSize( letter->Width, letter->Height );
+        filter.ApplyFilter();
+
+        Filter_Highlight filter2;
+        filter2.SetTextureRange(content32, letter->X, letter->Y, Width, Height);
+        filter2.SetFiltrationSize(letter->Width, letter->Height);
+        filter2.ApplyFilter();
       }
     }
 
