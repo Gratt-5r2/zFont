@@ -19,10 +19,6 @@ namespace GOTHIC_ENGINE {
       uint* content32;
     };
 
-    DDSURFACEDESC2 ddsd;
-    ZeroMemory( &ddsd, sizeof( ddsd ) );
-    ddsd.dwSize = sizeof( ddsd );
-
     int pitch;
     Texture->Lock( 0 );
     Texture->GetTextureBuffer( 0, contentPtr, pitch );
@@ -33,7 +29,7 @@ namespace GOTHIC_ENGINE {
     if( Union.Dx11IsEnabled() )
       std::swap( color.r, color.b );
 
-
+    int contentMax = contentWidth * Height;
     for each( auto letter in context.Letters ) {
       int width = letter->Width;
       int height = letter->Height;
@@ -55,10 +51,10 @@ namespace GOTHIC_ENGINE {
       filterShadow.SetFiltrationSize( letter->Width, letter->Height );
       if( DrawShadow && !colorIsDark )
         filterShadow.ApplyFilter();
-
+      
       Filter_Highlight filterHighlight;
       filterHighlight.SetPreviousFilter( filterShadow );
-      if( DrawHighlight )
+      if( DrawHighlight && !colorIsDark )
         filterHighlight.ApplyFilter();
     }
 

@@ -1,9 +1,6 @@
 // Supported with union (c) 2020 Union team
 // Union SOURCE file
 
-#include <shlobj.h>
-#pragma comment(lib,"shell32.lib")
-
 namespace GOTHIC_ENGINE {
   static Array<FontGeneric*> FontsGeneric;
   static Map<string, Font*> Fonts;
@@ -214,6 +211,11 @@ namespace GOTHIC_ENGINE {
 
     // TODO ?
     return true;
+  }
+
+
+  FontMap::FontMap() : Width( 0 ), Height( 0 ), FilledX( 0 ), FilledY( 0 ), LineHeight( 0 ) {
+
   }
 
 

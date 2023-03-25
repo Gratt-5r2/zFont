@@ -5,6 +5,12 @@
 #pragma comment (lib,"Gdiplus.lib")
 using namespace Gdiplus;
 
+#include <shlobj.h>
+#pragma comment(lib,"shell32.lib")
+#include <schrift/schrift.h>
+#pragma comment(lib, "schrift/schrift.lib")
+#include <locale>
+#include <codecvt>
 
 // Static RTTI DynamicCast pointer
 #if _DLL != 1

@@ -5,7 +5,7 @@ namespace GOTHIC_ENGINE {
   __declspec(naked) byte __fastcall add_bytes_overflow( byte b0, byte b1 ) {
     _asm {
       mov al, cl
-      add al, ch
+      add al, dl
       jnc nof
       mov al, 0xFF
       nof:
@@ -58,24 +58,6 @@ namespace GOTHIC_ENGINE {
    c.b = add_bytes_overflow(c.b, highlight.b );
    return c;
  }
-
-
-
-  byte NoiseIterator = 0;
-  const int NoiseLength = 0xFF;
-  const byte* Noise = []() {
-    byte* array = new byte[NoiseLength];
-    for( int i = 0; i < NoiseLength; i++ ) {
-      array[i] = (rand() % 4) * 10;
-      //cmd << array[i] << " ";
-    }
-    //cmd << endl;
-    return array;
-  }();
-
-  inline byte GetNoise() {
-    return Noise[NoiseIterator++];
-  }
 
 
   void Filter_QuadraticShadow::ApplyFilter() {

@@ -1,9 +1,6 @@
 // Supported with union (c) 2020 Union team
 // Union SOURCE file
 
-#include <locale>
-#include <codecvt>
-
 namespace GOTHIC_ENGINE {
   inline bool ansi_2_utf32( const char* input, std::u32string& output ) {
     int utf16len = MultiByteToWideChar( GetACP(), MB_ERR_INVALID_CHARS, input, strlen( input ), 0, 0 ); // TODO auto CP

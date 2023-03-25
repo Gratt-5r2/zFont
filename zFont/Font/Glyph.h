@@ -2,14 +2,14 @@
 // Union HEADER file
 
 namespace GOTHIC_ENGINE {
-	struct Glyph {
+  struct Glyph {
     char32_t Id;
     double OffsetX;
     double OffsetY;
     double PenWidth;
     SFT_Image Image;
     void Free();
-	};
+  };
 
 
   struct Letter {

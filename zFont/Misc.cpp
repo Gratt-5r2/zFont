@@ -2,8 +2,8 @@
 // Union SOURCE file
 
 namespace GOTHIC_ENGINE {
-  int	BilerpFiltering;
-  int	zBufferWriting;
+  int BilerpFiltering;
+  int zBufferWriting;
   zTRnd_ZBufferCmp zBufferComparing;
 
   void PushPrintRenderOptions( int bilertFlt, int zbufWrt, zTRnd_ZBufferCmp zbufCmp ) {
