@@ -19,6 +19,10 @@ SystemPack.ini > [Font] > DrawShadow
 
 SystemPack.ini > [Font] > DrawHighlight
 ; ... Highlights the font at the top.
+
+SystemPack.ini > [Font] > DefaultSystemFont
+; ... Name of the default system font name
+; if the Default.ttf is inexists.
 ```
 
 # Third-party:  
