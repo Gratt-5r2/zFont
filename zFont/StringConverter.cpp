@@ -1,56 +1,53 @@
-#define _CRT_SECURE_NO_WARNINGS
-#include <string> 
-#include <locale> 
+// Supported with union (c) 2020 Union team
+// Union SOURCE file
+
+#include <locale>
 #include <codecvt>
 
-#include <MLang.h>
-#include <comdef.h>
-using namespace std;
-
-// string (utf8) -> u16string -> wstring
-wstring utf8_to_utf16( const string& utf8 )
-{
-  wstring_convert<codecvt_utf8_utf16<char16_t>, char16_t> convert;
-  u16string utf16 = convert.from_bytes( utf8 );
-  wstring wstr( utf16.begin(), utf16.end() );
-  return wstr;
-}
-
-// wstring -> u16string -> string (utf8)
-string utf16_to_utf8( const wstring& utf16 ) {
-  u16string u16str( utf16.begin(), utf16.end() );
-  wstring_convert<codecvt_utf8_utf16<char16_t>, char16_t> convert;
-  string utf8 = convert.to_bytes( u16str );
-  return utf8;
-}
-
-
-bool isUtf8String( LPCSTR psz )
-{
-  if( psz == NULL || *psz == 0 )
-    return false;
-
-  typedef _com_ptr_t <_com_IIID<IMultiLanguage2, &__uuidof(IMultiLanguage2)>> IMultiLanguage2Ptr;
-  IMultiLanguage2Ptr spML;
-
-  spML.CreateInstance( CLSID_CMultiLanguage );
-  if( spML == NULL ) {
-    return false;
+namespace GOTHIC_ENGINE {
+  inline bool ansi_2_utf32( const char* input, std::u32string& output ) {
+    int utf16len = MultiByteToWideChar( GetACP(), MB_ERR_INVALID_CHARS, input, strlen( input ), 0, 0 ); // TODO auto CP
+    wchar_t* utf16ptr = new wchar_t[utf16len];
+    int len = MultiByteToWideChar( GetACP(), 0, input, strlen( input ), utf16ptr, utf16len );
+    for( int i = 0; i < utf16len; i++ )
+      output.push_back( utf16ptr[i] );
+    delete[] utf16ptr;
+    return len > 0;
   }
 
-  DetectEncodingInfo enc = { 0 };
-  int iEncLen = 1;
-  LPSTR pszBuf = new char[max( strlen( psz ), 1024 ) + 1];
-  strcpy( pszBuf, psz );
-  while( strlen( pszBuf ) < 300 )
-    strcat( pszBuf, psz );
-  int iLen = strlen( pszBuf );
-  if( S_OK == spML->DetectInputCodepage( MLDETECTCP_8BIT, 0, pszBuf, &iLen, &enc, &iEncLen ) && iEncLen == 1 )
-  {
-    delete[] pszBuf;
-    return enc.nCodePage == CP_UTF8;
+  inline bool charPtr_2_utf32( const char* input, std::u32string& output ) {
+    try {
+      std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> utf32conv;
+      output = utf32conv.from_bytes( input );
+      return true;
+    }
+    catch( std::range_error ex ) {
+      return ansi_2_utf32( input, output );
+    }
   }
 
-  delete[] pszBuf;
-  return false;
+
+  inline bool utf8_2_utf32( const char* input, std::u32string& output ) {
+    try {
+      std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> conv;
+      output = conv.from_bytes( input );
+      return true;
+    }
+    catch( std::range_error ex ) {
+      return ansi_2_utf32( input, output );
+    }
+  }
+
+
+  inline bool utf32_2_utf8( const char32_t* input, std::string& output ) {
+    try {
+      std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> conv;
+      output = conv.to_bytes( input );
+      return true;
+    }
+    catch( std::range_error ex ) {
+      // TODO ?
+      return false;
+    }
+  }
 }

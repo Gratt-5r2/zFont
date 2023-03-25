@@ -3,4 +3,4 @@
 // User API for zCOLOR
 // Add your methods here
 
-void Invert();
+int GetBrightness() { return (unsigned int)r + (unsigned int)g + (unsigned int)g; }

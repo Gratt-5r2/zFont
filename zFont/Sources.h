@@ -3,11 +3,17 @@
 
 // Automatically generated block
 #pragma region Includes
+#include "CharDetector.cpp"
+#include "StringConverter.cpp"
+#include "Misc.cpp"
 #include "Font/Font.cpp"
-#include "Font/FontAsync.cpp"
+#include "Font/FontBlit.cpp"
 #include "Font/Glyph.cpp"
 #include "Filter/Filter.cpp"
-#include "Hooks.cpp"
+#include "zFont.cpp"
+#include "zViewBlit.cpp"
+#include "zViewPrintBlit.cpp"
+#include "Surface32bit.cpp"
 #include "Plugin.cpp"
 #pragma endregion
 

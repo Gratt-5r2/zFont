@@ -229,6 +229,9 @@
     <Filter Include="Plugin\zFont\Filter">
       <UniqueIdentifier>{72fc7cc8-31da-440d-a4a7-b62ae25bb462}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Plugin\zFont\Utils">
+      <UniqueIdentifier>{9f10a006-2436-44a3-b085-9d51bcf56483}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Interface.cpp">
@@ -272,9 +275,6 @@
     </ClCompile>
     <ClCompile Include="ZenGin\Gothic_II_Addon\Statics_G2A.cpp">
       <Filter>Engine SDK\4. Gothic II NoTR\Overloads</Filter>
-    </ClCompile>
-    <ClCompile Include="StringConverter.cpp">
-      <Filter>Plugin\Workspace</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2811,10 +2811,7 @@
     <ClInclude Include="Font\Font.h">
       <Filter>Plugin\zFont\Font</Filter>
     </ClInclude>
-    <ClInclude Include="Hooks.cpp">
-      <Filter>Plugin\zFont\Hooks</Filter>
-    </ClInclude>
-    <ClInclude Include="Font\FontAsync.cpp">
+    <ClInclude Include="Font\FontBlit.cpp">
       <Filter>Plugin\zFont\Font</Filter>
     </ClInclude>
     <ClInclude Include="Filter\Filter.h">
@@ -2822,6 +2819,27 @@
     </ClInclude>
     <ClInclude Include="Filter\Filter.cpp">
       <Filter>Plugin\zFont\Filter</Filter>
+    </ClInclude>
+    <ClInclude Include="zViewBlit.cpp">
+      <Filter>Plugin\zFont\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="zViewPrintBlit.cpp">
+      <Filter>Plugin\zFont\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Surface32bit.cpp">
+      <Filter>Plugin\zFont\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="zFont.cpp">
+      <Filter>Plugin\zFont\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="StringConverter.cpp">
+      <Filter>Plugin\zFont\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc.cpp">
+      <Filter>Plugin\zFont\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CharDetector.cpp">
+      <Filter>Plugin\zFont\Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
