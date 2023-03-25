@@ -6,7 +6,7 @@ namespace GOTHIC_ENGINE {
   static Map<string, Font*> Fonts;
 
 
-  Glyph* FontGeneric::GetGlyph( wchar_t id ) {
+  Glyph* FontGeneric::GetGlyph( char32_t id ) {
     auto& pair = Glyphs[id];
     if( !pair.IsNull() )
       return pair;
@@ -53,17 +53,16 @@ namespace GOTHIC_ENGINE {
   }
 
 
-  FontGeneric* FontGeneric::GetFont( const string& name, double size, FontUnits metrix ) {
-    size *= FontScale;
-    bool gothicPoints = metrix == FontUnits::Gp;
+  FontGeneric* FontGeneric::GetFont( const string& name, double size, FontUnits units ) {
+    bool gothicPoints = units == FontUnits::Gp;
     if( gothicPoints )
-      metrix = FontUnits::Px;
+      units = FontUnits::Px;
 
     for each( auto font in FontsGeneric )
     {
       if( font->Name == name ) {
-        if( metrix == FontUnits::Px && font->SizePx == size ) return font;
-        if( metrix == FontUnits::Pt && font->SizePt == size ) return font;
+        if( units == FontUnits::Px && font->SizePx == size ) return font;
+        if( units == FontUnits::Pt && font->SizePt == size ) return font;
       }
     }
 
@@ -84,7 +83,7 @@ namespace GOTHIC_ENGINE {
     if( gothicPoints )
       size = CorrectHeightGp( fnt, size );
 
-    if( metrix == FontUnits::Px ) {
+    if( units == FontUnits::Px ) {
       font->SizePx = size;
       font->SizePt = Px2Pt( size );
     }
@@ -126,19 +125,32 @@ namespace GOTHIC_ENGINE {
 
 
 
-  FontMapBlitContext::FontMapBlitContext( const FontMapBlitContext& other ) {
+  FontMapBlitContext::FontMapBlitContext( const FontMapBlitContext& other ) : Invalidate( false ) {
     Map = other.Map;
     Letters = other.Letters;
   }
 
 
-  bool FontMapBlitContext::IsEmpty() {
+  void FontMapBlitContext::InsertLetter( Letter* letter ) {
+    Letters.Insert( letter );
+    Invalidate = true;
+  }
+
+
+  bool FontMapBlitContext::IsEmpty() const {
     return Letters.IsEmpty();
   }
 
 
+  bool FontMapBlitContext::NeedToBlit() const {
+    return !IsEmpty() && Invalidate;
+  }
+
+
   void FontMapBlitContext::Clear() {
-    Letters.Clear();
+    if( !CustomDirectDraw )
+      Letters.Clear();
+    Invalidate = false;
   }
 
 
@@ -192,56 +204,20 @@ namespace GOTHIC_ENGINE {
   }
 
 
-  extern Switch BlitEvent;
   void FontMap::Free() {
-    BlitEvent.WaitOff();
-    Texture[FrontTextureID]->Release();
-    Texture[BackTextureID]->Release();
-    delete TextureConvert;
+    Texture->Release();
   }
 
 
 
   zCTex_D3D* FontMap::CreateTexture() {
-#if 1
-    zCRnd_D3D* rnd = static_cast<zCRnd_D3D*>( zrenderer );
-    DDSURFACEDESC2 ddsd;
-    ZeroMemory( &ddsd, sizeof( ddsd ) );
-    ddsd.dwSize = sizeof( ddsd );
-    ddsd.dwFlags = DDSD_CAPS | DDSD_WIDTH | DDSD_HEIGHT | DDSD_PIXELFORMAT;
-    ddsd.ddsCaps.dwCaps = DDSCAPS_TEXTURE | DDSCAPS_VIDEOMEMORY;
-    ddsd.ddsCaps.dwCaps2 = DDSCAPS2_HINTSTATIC;
-    ddsd.dwWidth = DefMapSize;
-    ddsd.dwHeight = DefMapSize;
-    ddsd.ddpfPixelFormat.dwSize = sizeof( ddsd.ddpfPixelFormat );
-    ddsd.ddpfPixelFormat.dwFlags = DDPF_RGB | DDPF_ALPHAPIXELS;
-    ddsd.ddpfPixelFormat.dwRGBBitCount = 32;
-    ddsd.ddpfPixelFormat.dwRBitMask = 0x00FF0000;
-    ddsd.ddpfPixelFormat.dwGBitMask = 0x0000FF00;
-    ddsd.ddpfPixelFormat.dwBBitMask = 0x000000FF;
-    ddsd.ddpfPixelFormat.dwRGBAlphaBitMask = 0xFF000000;
-
-    zCTex_D3D* texture = new zCTex_D3D();
-    zCTextureInfo info;
-    info.numMipMap = 1;
-    info.sizeX = DefMapSize;
-    info.sizeY = DefMapSize;
-    info.texFormat = FntTexFormat;
-    texture->SetTextureInfo( info );
-    texture->xtex_pddtex[0];
-    rnd->xd3d_pdd7->CreateSurface( &ddsd, &texture->xtex_pddtex[0], Null );
-    // texture->CacheIn( -1 );
-#else
-
     zCTex_D3D* texture = static_cast<zCTex_D3D*>( zrenderer->CreateTexture() );
     zCTextureInfo texInfo;
     texInfo.numMipMap = 1;
-    texInfo.sizeX = DefMapSize;
-    texInfo.sizeY = DefMapSize;
-    texInfo.texFormat = zRND_TEX_FORMAT_BGRA_8888;
+    texInfo.sizeX = DefaultMapSize;
+    texInfo.sizeY = DefaultMapSize;
+    texInfo.texFormat = FontTextureFormat;
     texture->SetTextureInfo( texInfo );
-#endif
-
     return texture;
   }
 
@@ -253,40 +229,21 @@ namespace GOTHIC_ENGINE {
     map->Width = width;
     map->Height = height;
     map->Color = color;
-
-    zCTextureInfo texInfo;
-    texInfo.averageColor = GFX_BLACK;
-    texInfo.numMipMap = 1;
-    texInfo.sizeX = width;
-    texInfo.sizeY = height;
-    texInfo.texFormat = FntTexFormat;
-    map->TextureConvert = zrenderer->CreateTextureConvert();
-    map->TextureConvert->SetTextureInfo( texInfo );
-
-    for( int i = 0; i < MapTexturesCount; i++ ) {
-      map->Texture[i] = CreateTexture(); // zrenderer->CreateTexture();
-      map->Texture[i]->CacheIn( -1 );
-      map->Texture[i]->hasAlpha = True;
-      // auto texD3D = map->Texture[i]->CastTo<zCTex_D3D>();
-      // if( texD3D ) {
-      //   texD3D->xtex_texinfo.
-      // }
-    }
-
+    map->Texture = CreateTexture();
     return map;
   }
 
 
-  Font* Font::GetFont( const string& name, const zCOLOR& color, double defaultSize, FontUnits metrix ) {
+  Font* Font::GetFont( const string& name, const zCOLOR& color, double defaultSize, FontUnits units ) {
     string nameUpper = string::Combine( "%s%F", name, defaultSize ).Upper();
     auto& pair = Fonts[nameUpper];
     if( !pair.IsNull() )
       return pair;
 
     string nameNoExt = nameUpper.GetWord( "." );
-    FontGeneric* fontGeneric = FontGeneric::GetFont( nameNoExt + ".ttf", defaultSize, metrix ); // TODO optional names
+    FontGeneric* fontGeneric = FontGeneric::GetFont( nameNoExt + ".ttf", defaultSize, units ); // TODO optional names
     if( !fontGeneric ) {
-      fontGeneric = FontGeneric::GetFont( "Default.ttf", defaultSize, metrix );
+      fontGeneric = FontGeneric::GetFont( "Default.ttf", defaultSize, units );
       if( !fontGeneric )
         return Null;
     }
@@ -295,7 +252,6 @@ namespace GOTHIC_ENGINE {
     font->Name = nameNoExt;
     font->FontProto = fontGeneric;
     font->Color = color;
-    font->PreRender();
     Fonts.Insert( nameUpper, font );
     return font;
   }
@@ -327,12 +283,12 @@ namespace GOTHIC_ENGINE {
   }
 
 
-  Font* Font::GetFontDefault( double defaultSize, FontUnits metrix ) {
-    return GetFont( "Default.ttf", GFX_WHITE, defaultSize, metrix );
+  Font* Font::GetFontDefault( double defaultSize, FontUnits units ) {
+    return GetFont( "Default.ttf", GFX_WHITE, defaultSize, units );
   }
 
 
-  Letter* Font::GetLetter( wchar_t id ) {
+  Letter* Font::GetLetter( char32_t id ) {
     if( id == 0 )
       return Null;
 
@@ -375,6 +331,14 @@ namespace GOTHIC_ENGINE {
   }
 
 
+  void Font::PrepareLettersForText( std::u32string unicode ) {
+    for( int i = 0; i < unicode.length(); i++ )
+      GetLetter( unicode[i] );
+    Font::BlitLetters();
+    FontMap::BlitProcess();
+  }
+
+
   void Font::Free() {
     if( FontProto )
       FontProto->Release();
@@ -384,24 +348,6 @@ namespace GOTHIC_ENGINE {
 
     Maps.Clear();
     Letters.Clear();
-  }
-
-
-#define COMPILE_LETTERS(from, to) for( int i = from; i <= to; i++ ) { GetLetter( i ); /*cmd << wstring( (wchar_t)i ) << " ";*/ } /*cmd << endl;*/
-
-  void Font::PreRender() {
-    // cmd << "creating default chars begin... ";
-    // COMPILE_LETTERS( 0x0020, 0x007F ); // Basic Latin
-    // COMPILE_LETTERS( 0x00A0, 0x00FF ); // Latin-1 Supplement
-    // COMPILE_LETTERS( 0x0100, 0x017F ); // Latin Extended-A	
-    // COMPILE_LETTERS( 0x0180, 0x024F ); // Latin Extended-B	
-    // COMPILE_LETTERS( 0x0250, 0x02AF ); // IPA Extensions	 	
-    // COMPILE_LETTERS( 0x0300, 0x036F ); // Combining Diacritical Marks
-    // COMPILE_LETTERS( 0x0370, 0x03FF ); // Greek and Coptic
-    // COMPILE_LETTERS( 0x0400, 0x04FF ); // Cyrillic
-    // BlitLetters();
-    // BlitEvent.WaitOff();
-    // cmd << " done." << endl;
   }
 
 

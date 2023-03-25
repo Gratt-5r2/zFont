@@ -870,6 +870,10 @@ $(ALLUSERSPROFILE)\Union\SDK\Union\v1.0m\Build\incver.exe $(ProjectDir)</Command
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DllMain.cpp" />
+    <ClInclude Include="CharDetector.cpp">
+      <SubType>
+      </SubType>
+    </ClInclude>
     <ClInclude Include="Filter\Filter.h">
       <SubType>
       </SubType>
@@ -878,7 +882,7 @@ $(ALLUSERSPROFILE)\Union\SDK\Union\v1.0m\Build\incver.exe $(ProjectDir)</Command
       <SubType>
       </SubType>
     </ClInclude>
-    <ClInclude Include="Font\FontAsync.cpp">
+    <ClInclude Include="Font\FontBlit.cpp">
       <SubType>
       </SubType>
     </ClInclude>
@@ -895,13 +899,12 @@ $(ALLUSERSPROFILE)\Union\SDK\Union\v1.0m\Build\incver.exe $(ProjectDir)</Command
       <SubType>
       </SubType>
     </ClInclude>
-    <ClInclude Include="Hooks.cpp">
+    <ClInclude Include="Misc.cpp">
       <SubType>
       </SubType>
     </ClInclude>
     <ClInclude Include="Plugin.cpp" />
     <ClCompile Include="Interface.cpp" />
-    <ClCompile Include="StringConverter.cpp" />
     <ClCompile Include="ZenGin\Gothic_II_Addon\ClassDeclarators_G2A.cpp" />
     <ClCompile Include="ZenGin\Gothic_II_Addon\Globals_G2A.cpp" />
     <ClCompile Include="ZenGin\Gothic_II_Addon\Statics_G2A.cpp" />
@@ -914,6 +917,26 @@ $(ALLUSERSPROFILE)\Union\SDK\Union\v1.0m\Build\incver.exe $(ProjectDir)</Command
     <ClCompile Include="ZenGin\Gothic_I_Classic\ClassDeclarators_G1.cpp" />
     <ClCompile Include="ZenGin\Gothic_I_Classic\Globals_G1.cpp" />
     <ClCompile Include="ZenGin\Gothic_I_Classic\Statics_G1.cpp" />
+    <ClInclude Include="StringConverter.cpp">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="Surface32bit.cpp">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="zFont.cpp">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="zViewBlit.cpp">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="zViewPrintBlit.cpp">
+      <SubType>
+      </SubType>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Plugin.h" />

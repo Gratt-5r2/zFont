@@ -6,3 +6,5 @@
 int FontY_Union();
 int FontSize_Union( zSTRING& );
 void PrintChars_Union( int, int, zSTRING const& );
+void BlitText_Union();
+void Print_Union( int, int, zSTRING const& );

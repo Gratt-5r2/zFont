@@ -3,7 +3,7 @@
 
 namespace GOTHIC_ENGINE {
 	struct Glyph {
-		wchar_t Id;
+    char32_t Id;
     double OffsetX;
     double OffsetY;
     double PenWidth;

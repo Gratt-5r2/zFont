@@ -8,9 +8,8 @@ namespace GOTHIC_ENGINE {
 		int Width;
 		int Height;
 	public:
-		Filter() { }
-		Filter( Filter& filter );
 		void __fastcall SetTextureRange( void* pixels, int x, int y, int w, int h );
+		void __fastcall SetPreviousFilter( Filter& filter );
 		void __fastcall SetFiltrationSize( int w, int h );
 	};
 
