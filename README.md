@@ -21,5 +21,5 @@ SystemPack.ini > [Font] > DrawHighlight
 ; ... Highlights the font at the top.
 ```
 
-Third-party:
-libschrift: https://github.com/tomolt/libschrift
+# Third-party:  
+**libschrift:** https://github.com/tomolt/libschrift
