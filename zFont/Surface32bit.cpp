@@ -2,7 +2,14 @@
 // Union SOURCE file
 
 namespace GOTHIC_ENGINE {
-  HOOK Hook_zCTex_D3D_XTEX_BuildSurfaces PATCH( &zCTex_D3D::XTEX_BuildSurfaces, &zCTex_D3D::XTEX_BuildSurfaces_Union );
+#if ENGINE == Engine_G2A
+#define DEFDDPF_ADR 0x009D1678
+#define DEFDDPF_OP  0x00655598
+#elif ENGINE == Engine_G1
+#define DEFDDPF_ADR 0x008FE9E0
+#define DEFDDPF_OP  0x0071CE54
+#endif
+
 
   inline void SetPixelFormatBGRA8888( LPDDPIXELFORMAT ddpf ) {
     ddpf->dwFlags           = DDPF_RGB | DDPF_ALPHAPIXELS;
@@ -13,13 +20,8 @@ namespace GOTHIC_ENGINE {
     ddpf->dwRGBAlphaBitMask = 0xFF000000;
   }
 
-#if ENGINE == Engine_G2A
-#define DEFDDPF_ADR 0x009D1678
-#define DEFDDPF_OP  0x00655598
-#elif ENGINE == Engine_G1
-#define DEFDDPF_ADR 0x008FE9E0
-#define DEFDDPF_OP  0x0071CE54
-#endif
+
+  HOOK Hook_zCTex_D3D_XTEX_BuildSurfaces PATCH( &zCTex_D3D::XTEX_BuildSurfaces, &zCTex_D3D::XTEX_BuildSurfaces_Union );
 
   int zCTex_D3D::XTEX_BuildSurfaces_Union( int decompress ) {
     if( xtex_texinfo.texFormat == zRND_TEX_FORMAT_BGRA_8888 ) {

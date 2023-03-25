@@ -15,6 +15,7 @@ namespace GOTHIC_ENGINE {
     return len > 0;
   }
 
+
   inline bool charPtr_2_utf32( const char* input, std::u32string& output ) {
     try {
       std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> utf32conv;

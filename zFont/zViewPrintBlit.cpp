@@ -61,6 +61,11 @@ namespace GOTHIC_ENGINE {
       Letter* letter = ttf->GetLetter( u32 );
       int u32len = letter ? letter->Glyph->PenWidth : 0;
 
+      if( u32 == '\t' ) {
+        lineLen += ttf->GetLetter( ' ' )->Glyph->PenWidth * 4;
+        continue;
+      }
+
       if( !IsSequentalSymbol( u32 ) ) {
         if( u32 == '\n' || u32 == '\0' || lineLen + wordLen > viewWidth ) {
           if( u32 == ' ' )
@@ -112,6 +117,11 @@ namespace GOTHIC_ENGINE {
       char32_t u32 = unicode[i];
       if( u32 == '\r' )
         continue;
+
+      if( u32 == '\t' ) {
+        pen.X += ttf->GetLetter( ' ' )->Glyph->PenWidth * 4;
+        continue;
+      }
 
       Letter* letter = ttf->GetLetter( u32 );
       if( !letter )
