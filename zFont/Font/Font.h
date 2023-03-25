@@ -14,6 +14,7 @@ namespace GOTHIC_ENGINE {
 	float FontScale = 1.0;
 	bool DrawShadow = true;
 	bool DrawHighlight = true;
+	string DefaultSystemFont = "timesbd.ttf";
 
 
 	struct Glyph;
@@ -42,6 +43,7 @@ namespace GOTHIC_ENGINE {
 		SFT* Schrift;
 		Glyph* GetGlyph( char32_t id );
 		static FontGeneric* GetFont(const string& name, double size, FontUnits units = FontUnits::Pt);
+		static FontGeneric* GetFontDefault( double defaultSize = 18.0, FontUnits units = FontUnits::Pt );
 		~FontGeneric();
 	};
 
@@ -99,7 +101,6 @@ namespace GOTHIC_ENGINE {
 		void PrepareLettersForText( std::u32string unicode );
 		static Font* GetFont( const string& name, const zCOLOR& color, double defaultSize = 18.0, FontUnits units = FontUnits::Pt );
 		static Font* GetFont( zCFont* ingameFont );
-		static Font* GetFontDefault( double defaultSize = 18.0, FontUnits units = FontUnits::Pt );
 		static void BlitLetters();
 		~Font();
 	};

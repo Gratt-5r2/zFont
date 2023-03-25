@@ -67,9 +67,9 @@ namespace GOTHIC_ENGINE {
     byte* array = new byte[NoiseLength];
     for( int i = 0; i < NoiseLength; i++ ) {
       array[i] = (rand() % 4) * 10;
-      cmd << array[i] << " ";
+      //cmd << array[i] << " ";
     }
-    cmd << endl;
+    //cmd << endl;
     return array;
   }();
 

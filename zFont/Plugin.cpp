@@ -16,11 +16,10 @@ namespace GOTHIC_ENGINE {
     string ddrawFileName = buffer;
     CustomDirectDraw = ddrawFileName.StartWith( Union.GetGameDirectory() );
 
-
-
     Union.GetSysPackOption().Read( FontScale, "Font", "Scale", FontScale );
-    Union.GetSysPackOption().Read( FontScale, "Font", "DrawShadow", DrawShadow );
-    Union.GetSysPackOption().Read( FontScale, "Font", "DrawHighlight", DrawHighlight );
+    Union.GetSysPackOption().Read( DrawShadow, "Font", "DrawShadow", DrawShadow );
+    Union.GetSysPackOption().Read( DrawHighlight, "Font", "DrawHighlight", DrawHighlight );
+    Union.GetSysPackOption().Read( DefaultSystemFont, "Font", "DefaultSystemFont", DefaultSystemFont );
   }
 
   void Game_Exit() {

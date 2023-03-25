@@ -1,6 +1,9 @@
 // Supported with union (c) 2020 Union team
 // Union SOURCE file
 
+#include <shlobj.h>
+#pragma comment(lib,"shell32.lib")
+
 namespace GOTHIC_ENGINE {
   static Array<FontGeneric*> FontsGeneric;
   static Map<string, Font*> Fonts;
@@ -21,9 +24,10 @@ namespace GOTHIC_ENGINE {
     if( sft_gmetrics( Schrift, gl, &mtx ) < 0 )
       return Null;
 
-    img.width = mtx.minWidth;
-    img.height = mtx.minHeight;
+    img.width = mtx.minWidth + 5;
+    img.height = mtx.minHeight + 5;
     img.pixels = new byte[img.width * img.height];
+    memset( img.pixels, 0, img.width * img.height );
     sft_render( Schrift, gl, img );
 
     Glyph* glyph = new Glyph();
@@ -53,6 +57,35 @@ namespace GOTHIC_ENGINE {
   }
 
 
+  inline long ReadFromVDFS( string fileName, byte** content ) {
+    VirtualFile vfile( fileName );
+    if( !vfile.IsExists() )
+      return 0;
+
+    long length = vfile.Size();
+    *content = new byte[length];
+    vfile.ReadToEnd( *content );
+    vfile.Close();
+    return length;
+  }
+
+
+  inline long ReadFromPhysicalFS( string fileName, byte** content ) {
+    FILE* stream = Null;
+    if( fopen_s( &stream, fileName, "rb" ) != 0 )
+      return 0;
+
+    fseek( stream, 0, SEEK_END );
+    long length = ftell( stream );
+    fseek( stream, 0, SEEK_SET );
+
+    *content = new byte[length];
+    fread( *content, 1, length, stream );
+    fclose( stream );
+    return length;
+  }
+
+
   FontGeneric* FontGeneric::GetFont( const string& name, double size, FontUnits units ) {
     bool gothicPoints = units == FontUnits::Gp;
     if( gothicPoints )
@@ -66,15 +99,15 @@ namespace GOTHIC_ENGINE {
       }
     }
 
-    VirtualFile vfile( name );
-    if( !vfile.IsExists() )
-      return Null;
+    byte* content = Null;
+    long fileLength = ReadFromVDFS( name, &content );
+    if( fileLength == 0 ) {
+      fileLength = ReadFromPhysicalFS( name, &content );
+      if( fileLength == 0 )
+        return Null;
+    }
 
-    byte* memory = new byte[vfile.Size()];
-    vfile.ReadToEnd( memory );
-    SFT_Font* fnt = sft_loadmem( memory, vfile.Size() );
-    vfile.Close();
-
+    SFT_Font* fnt = sft_loadmem( content, fileLength );
     if( !fnt )
       return Null;
 
@@ -108,6 +141,18 @@ namespace GOTHIC_ENGINE {
 
     FontsGeneric.Insert( font );
     return font;
+  }
+
+
+  FontGeneric* FontGeneric::GetFontDefault( double defaultSize, FontUnits units ) {
+    FontGeneric* fontGeneric = FontGeneric::GetFont( "Default.ttf", defaultSize, units );
+    if( fontGeneric )
+      return fontGeneric;
+
+    char system_folder[MAX_PATH];
+    SHGetSpecialFolderPath( 0, system_folder, CSIDL_FONTS, true );
+    string systemFontName = string::Combine( "%t\\%s", system_folder, DefaultSystemFont );
+    return FontGeneric::GetFont( systemFontName, defaultSize, units );
   }
 
 
@@ -243,7 +288,7 @@ namespace GOTHIC_ENGINE {
     string nameNoExt = nameUpper.GetWord( "." );
     FontGeneric* fontGeneric = FontGeneric::GetFont( nameNoExt + ".ttf", defaultSize, units ); // TODO optional names
     if( !fontGeneric ) {
-      fontGeneric = FontGeneric::GetFont( "Default.ttf", defaultSize, units );
+      fontGeneric = FontGeneric::GetFontDefault( defaultSize, units );
       if( !fontGeneric )
         return Null;
     }
@@ -259,7 +304,7 @@ namespace GOTHIC_ENGINE {
 
   Font* Font::GetFont( zCFont* ingameFont ) {
     if( !ingameFont )
-      return GetFontDefault();
+      return Null;
 
     string fontName = ingameFont->name;
     float fontSize = ingameFont->GetFontY();
@@ -280,11 +325,6 @@ namespace GOTHIC_ENGINE {
 
     Font* font = GetFont( fontName, color, fontSize, FontUnits::Gp );
     return font;
-  }
-
-
-  Font* Font::GetFontDefault( double defaultSize, FontUnits units ) {
-    return GetFont( "Default.ttf", GFX_WHITE, defaultSize, units );
   }
 
 
