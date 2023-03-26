@@ -48,9 +48,9 @@ namespace GOTHIC_ENGINE {
     charPtr_2_utf32( text, unicode );
     uint index = 0;
 
-    zPOS lside, rside;
+    zCPosition lside, rside;
     GetPixelBorder( lside, rside );
-    int viewWidth = rside.X - lside.X - 20;
+    int viewWidth = rside.X - lside.X - 14;
 
     int start   = 0;
     int lineLen = 0;
@@ -71,9 +71,9 @@ namespace GOTHIC_ENGINE {
           if( u32 == ' ' )
             end++;
 
-          std::u32string subutf32 = unicode.substr( start, end - start );
+          std::u32string subUtf32 = unicode.substr( start, end - start );
           std::string subUtf8;
-          utf32_2_utf8( subutf32.c_str(), subUtf8);
+          utf32_2_utf8( subUtf32.c_str(), subUtf8);
           zSTRING subZstr( subUtf8.c_str() );
           PrintLine( subZstr );
           start = end;
@@ -115,7 +115,7 @@ namespace GOTHIC_ENGINE {
 
     for( int i = 0; i < unicode.length(); i++ ) {
       char32_t u32 = unicode[i];
-      if( u32 == '\r' )
+      if( u32 == '\n' || u32 == '\r' )
         continue;
 
       if( u32 == '\t' ) {
@@ -128,15 +128,6 @@ namespace GOTHIC_ENGINE {
         continue;
 
       int u32len = letter->Glyph->PenWidth;
-#if 0
-      if( u32 == '\n' || pen.X + u32len >= rside.X ) {
-        pen.X = pen0.X;
-        pen.Y += ingameFont->GetFontY();
-      }
-#else
-      if( u32 == '\n' )
-        continue;
-#endif
 
       zVEC2 pos1, pos2;
       letter->GetScreenPositions( pen.X, pen.Y, pos1, pos2 );

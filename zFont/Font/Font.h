@@ -60,6 +60,8 @@ namespace GOTHIC_ENGINE {
 
 
   struct FontMap {
+    // Needed to collect as many characters as possible
+    // before displaying them on the texture map
     FontMapBlitContext CumulativeBlitContext;
 
     Font* OwnedFont;
@@ -84,7 +86,6 @@ namespace GOTHIC_ENGINE {
     void FlushBlitContext();
     zCTex_D3D* GetTexture();
     static void BlitProcess();
-    static void BlitProcessAsync();
   };
 
 

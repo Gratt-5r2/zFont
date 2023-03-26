@@ -129,6 +129,7 @@ namespace GOTHIC_ENGINE {
     sft->yScale = font->SizePx;
     sft->flags = SFT_DOWNWARD_Y;
     font->Schrift = sft;
+    font->Memory = content;
 
     SFT_LMetrics lmtx;
     sft_lmetrics( sft, &lmtx );

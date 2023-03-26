@@ -50,7 +50,7 @@ namespace GOTHIC_ENGINE {
     return new_color;
   }
 
- const zCOLOR highlight = zCOLOR( 24, 24, 24 );
+ const zCOLOR highlight = zCOLOR( 18, 18, 18 );
 
  inline zCOLOR Brighten(zCOLOR c) {
    c.r = add_bytes_overflow(c.r, highlight.r );

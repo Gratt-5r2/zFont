@@ -21,12 +21,6 @@ namespace GOTHIC_ENGINE {
   };
 
 
-  class Filter_Glitter : public Filter {
-    void ApplyGlitter( int x0, int x1, int y );
-  public:
-    void ApplyFilter();
-  };
-
   class Filter_Highlight : public Filter {
   public:
     virtual void ApplyFilter();
