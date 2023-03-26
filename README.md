@@ -43,3 +43,7 @@ SystemPack.ini > [Font] > DefaultSystemFont
 
 # Third-party:  
 **libschrift:** https://github.com/tomolt/libschrift
+Font rendering Library.
+
+**uchardet** https://github.com/BYVoid/uchardet (https://gitlab.freedesktop.org/uchardet/)
+Library for detecting language and encoding of the text.
