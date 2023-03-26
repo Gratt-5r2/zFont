@@ -42,8 +42,8 @@ SystemPack.ini > [Font] > DefaultSystemFont
 </details>
 
 # Third-party:  
-**libschrift:** https://github.com/tomolt/libschrift
-Font rendering Library.
+**libschrift:** https://github.com/tomolt/libschrift  
+Font rendering Library (ISC License).
 
-**uchardet** https://github.com/BYVoid/uchardet (https://gitlab.freedesktop.org/uchardet/)
-Library for detecting language and encoding of the text.
+**uchardet** https://github.com/BYVoid/uchardet (https://gitlab.freedesktop.org/uchardet/)  
+Library for detecting language and encoding of the text (MPL 1.1).
