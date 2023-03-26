@@ -3,7 +3,7 @@ Initially, the project was started at the request of the Chinese community.
 The plugin allows to use TTF font in the Gothic 1 and Gothic 2. It is recommended to use UTF-8 in the scripts.  
   
   
-For the plugin to work correctly place `Default.ttf` to the `Gothic\System\Fonts` directory. This font will replace all game fonts.  
+For the plugin to work correctly `Default.ttf` will be placed to the `Gothic\System\Fonts` directory. This font will replace all game fonts.  
 If this font is not exists, then the system font, which is specified in the SystemPack.ini, will be taken.  
 To replace a specific font, its name should be identical to the game one: `FONT_10_BOOK.TGA` -> `FONT_10_BOOK.TTF`.  
 
