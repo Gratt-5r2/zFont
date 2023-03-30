@@ -34,7 +34,7 @@ namespace GOTHIC_ENGINE {
       return true;
     }
     catch( std::range_error ex ) {
-      return ansi_2_utf32( input, output, GameEncoding );
+      return ansi_2_utf32( input, output, GetACP() );
     }
     return true;
   }
