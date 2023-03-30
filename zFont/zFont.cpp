@@ -19,7 +19,7 @@ namespace GOTHIC_ENGINE {
       return 0;
 
     std::u32string unicode;
-    charPtr_2_utf32( line, unicode );
+    charPtr_2_utf32( line.ToChar(), unicode);
     for( int i = 0; i < unicode.length(); i++ ) {
       char32_t u32 = unicode[i];
       if( u32 == '\r' || u32 == '\n' )

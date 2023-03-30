@@ -13,6 +13,7 @@ namespace GOTHIC_ENGINE {
   bool DrawShadow = true;
   bool DrawHighlight = true;
   string DefaultSystemFont = "timesbd.ttf";
+  int StaticEncoding = 0;
 
 
   struct Glyph;

@@ -60,15 +60,15 @@ namespace GOTHIC_ENGINE {
     float farZ = GetCameraFarZ();
 
     std::u32string unicode;
-    charPtr_2_utf32( line, unicode );
+    charPtr_2_utf32( line.ToChar(), unicode);
     ttf->PrepareLettersForText( unicode );
 
     for( int i = 0; i < unicode.length(); i++ ) {
-      char32_t wc = unicode[i];
-      if( wc == '\r' || wc == '\n' )
+      char32_t u32 = unicode[i];
+      if( u32 == '\r' || u32 == '\n' )
         continue;
 
-      Letter* letter = ttf->GetLetter( wc );
+      Letter* letter = ttf->GetLetter( u32 );
       if( !letter )
         continue;
 

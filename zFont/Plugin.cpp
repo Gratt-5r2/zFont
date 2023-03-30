@@ -1,14 +1,7 @@
 ﻿// This file added in headers queue
 // File: "Sources.h"
-#include "resource.h"
-extern bool isUtf8String( LPCSTR psz );
-
-#include "zNppUniversalDetector.h"
 
 namespace GOTHIC_ENGINE {
-  // TO DO
-  // Your code ...
-
   void Game_Entry() {
     HMODULE handle = GetModuleHandle( "ddraw.dll" );
     char buffer[1024];
@@ -20,29 +13,37 @@ namespace GOTHIC_ENGINE {
     Union.GetSysPackOption().Read( DrawShadow, "Font", "DrawShadow", DrawShadow );
     Union.GetSysPackOption().Read( DrawHighlight, "Font", "DrawHighlight", DrawHighlight );
     Union.GetSysPackOption().Read( DefaultSystemFont, "Font", "DefaultSystemFont", DefaultSystemFont );
+    Union.GetSysPackOption().Read( StaticEncoding, "Font", "StaticEncoding", StaticEncoding );
+    if( StaticEncoding != 65001 && StaticEncoding < 1250 && StaticEncoding > 1258 )
+      StaticEncoding = 0;
   }
 
   void Game_Exit() {
   }
 
   void Game_Init() {
+    // DefineCurrentLanguage();
+    GameEncoding = GuessGameEncoding();
+    cmd << "Choosen CP: " << GameEncoding << endl;
   }
 
   void Game_PreLoop() {
   }
 
   void Game_Loop() {
-    // FontMap::BlitProcess();
-    // Font::BlitLetters();
+    if( StaticEncoding == 0 && !ogame->IsOnPause() ) {
+      SwapGuessedEncodings();
+    }
   }
 
   void Game_PostLoop() {
   }
 
   void Game_MenuLoop() {
-    // FontMap::BlitProcess();
-    // Font::BlitLetters();
-  }
+    if( StaticEncoding == 0 ) {
+      SwapGuessedEncodings();
+    }
+  } 
 
   // Information about current saving or loading world
   TSaveLoadGameInfo& SaveLoadGameInfo = UnionCore::SaveLoadGameInfo;

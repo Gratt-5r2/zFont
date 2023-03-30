@@ -21,8 +21,8 @@ namespace GOTHIC_ENGINE {
     if( sft_gmetrics( Schrift, gl, &mtx ) < 0 )
       return Null;
 
-    img.width = mtx.minWidth + 5;
-    img.height = mtx.minHeight + 5;
+    img.width = mtx.minWidth + 10;
+    img.height = mtx.minHeight + 10;
     img.pixels = new byte[img.width * img.height];
     memset( img.pixels, 0, img.width * img.height );
     sft_render( Schrift, gl, img );

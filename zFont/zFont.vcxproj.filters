@@ -2835,11 +2835,14 @@
     <ClInclude Include="Misc.cpp">
       <Filter>Plugin\zFont\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="CharDetector.cpp">
+    <ClInclude Include="CharsetDetector.cpp">
       <Filter>Plugin\zFont\Utils</Filter>
     </ClInclude>
     <ClInclude Include="Font\Glyph.h">
       <Filter>Plugin\zFont\Font</Filter>
+    </ClInclude>
+    <ClInclude Include="zViewMessage.cpp">
+      <Filter>Plugin\zFont\Hooks</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

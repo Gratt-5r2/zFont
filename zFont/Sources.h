@@ -3,7 +3,7 @@
 
 // Automatically generated block
 #pragma region Includes
-#include "CharDetector.cpp"
+#include "CharsetDetector.cpp"
 #include "StringConverter.cpp"
 #include "Misc.cpp"
 #include "Font/Font.cpp"
@@ -12,6 +12,7 @@
 #include "Filter/Filter.cpp"
 #include "zFont.cpp"
 #include "zViewBlit.cpp"
+#include "zViewMessage.cpp"
 #include "zViewPrintBlit.cpp"
 #include "Surface32bit.cpp"
 #include "Plugin.cpp"
