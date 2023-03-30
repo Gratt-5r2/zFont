@@ -85,8 +85,7 @@ namespace GOTHIC_ENGINE {
 
     for( int i = 0; i <= unicode.length(); i++ ) {
       char32_t u32 = unicode[i];
-      Letter* letter = ttf->GetLetter( u32 );
-      int letterWidth = letter ? letter->Glyph->PenWidth : 0;
+      int letterWidth = ttf->GetLetterWidth( u32 );
 
       lineWidthPx += letterWidth;
       if( !IsWordSymbol( u32 ) ) {

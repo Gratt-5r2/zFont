@@ -97,6 +97,7 @@ namespace GOTHIC_ENGINE {
     Array<FontMap*> Maps;
     Map<char32_t, Letter*> Letters;
     Letter* GetLetter( char32_t id );
+    double GetLetterWidth( char32_t id );
     FontMap* GetMap( int requiredWidth, int requiredHeight );
     void Free();
     void PrepareLettersForText( std::u32string unicode );

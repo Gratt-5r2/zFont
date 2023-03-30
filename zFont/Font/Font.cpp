@@ -207,11 +207,7 @@ namespace GOTHIC_ENGINE {
       LineHeight = 0;
     }
 
-    if( Height - FilledY < (height + OutlineSize) )
-      return false;
-
-    // TODO ?
-    return true;
+    return Height - FilledY >= (height + OutlineSize);
   }
 
 
@@ -350,6 +346,18 @@ namespace GOTHIC_ENGINE {
 
     Letters.Insert( id, letter );
     return letter;
+  }
+
+
+  double Font::GetLetterWidth( char32_t id ) {
+    if( id == '\0' || id == '\r' || id == '\n' )
+      return 0.0;
+
+    if( id == '\t' )
+      return GetLetterWidth( ' ' ) * 4.0;
+    
+    Letter* letter = GetLetter( id );
+    return letter ? letter->Glyph->PenWidth : 0;
   }
 
 

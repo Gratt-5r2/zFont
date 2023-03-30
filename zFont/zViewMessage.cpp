@@ -68,7 +68,7 @@ namespace GOTHIC_ENGINE {
     if( !npcName.IsEmpty() )
       textHeightVt += fontYVt;
 
-    int padding = (viewHeightVt - textHeightVt) / -2;
+    int padding = (viewHeightVt - textHeightVt) / -2 - (fontYVt / 2);
 
     if( !npcName.IsEmpty() ) {
       zCOLOR npcNameColor = GFX_WHITE;
