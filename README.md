@@ -48,5 +48,5 @@ Font rendering Library (ISC License).
 **uchardet** https://github.com/BYVoid/uchardet (https://gitlab.freedesktop.org/uchardet/)  
 Library for detecting language and encoding of the text (MPL 1.1).
 
-**compact_enc_det** https://github.com/google/compact_enc_det
+**compact_enc_det** https://github.com/google/compact_enc_det  
 Library for detecting encoding of the text (Apache License 2.0).
