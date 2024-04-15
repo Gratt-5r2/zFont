@@ -26,8 +26,6 @@ namespace GOTHIC_ENGINE {
 
     zCOLOR color = Color;
     bool colorIsDark = color.GetBrightness() < 150;
-    if( Union.Dx11IsEnabled() )
-      std::swap( color.r, color.b );
 
     int contentMax = contentWidth * Height;
     for each( auto letter in context.Letters ) {
